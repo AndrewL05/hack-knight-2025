@@ -1,4 +1,4 @@
-# EchoTwin Backend
+# Backend
 
 Express.js backend for the SayLess AI Meeting Assistant.
 
