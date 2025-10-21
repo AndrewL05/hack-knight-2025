@@ -1,7 +1,7 @@
-import express from 'express';
-import recallService from '../services/recallService.js';
-import Meeting from '../models/Meeting.js';
-import mongoose from 'mongoose';
+import express from "express";
+import recallService from "../services/recallService.js";
+import Meeting from "../models/Meeting.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -14,19 +14,19 @@ const router = express.Router();
  *   - botName: Display name for the bot
  *   - userId: User ID who is launching the bot
  */
-router.post('/launch', async (req, res) => {
+router.post("/launch", async (req, res) => {
   try {
     const { meetingUrl, botName, userId } = req.body;
 
     if (!meetingUrl) {
       return res.status(400).json({
-        error: 'Meeting URL is required',
+        error: "Meeting URL is required",
       });
     }
 
     if (!userId) {
       return res.status(400).json({
-        error: 'User ID is required',
+        error: "User ID is required",
       });
     }
 
@@ -34,7 +34,7 @@ router.post('/launch', async (req, res) => {
     const existingBot = recallService.getBotByUserId(userId);
     if (existingBot) {
       return res.status(409).json({
-        error: 'You already have an active bot in a meeting',
+        error: "You already have an active bot in a meeting",
         bot: existingBot,
       });
     }
@@ -42,7 +42,7 @@ router.post('/launch', async (req, res) => {
     // Create the bot
     const bot = await recallService.createBot({
       meetingUrl,
-      botName: botName || 'EchoTwin AI',
+      botName: botName || "AI Assistant",
       userId,
     });
 
@@ -52,32 +52,33 @@ router.post('/launch', async (req, res) => {
         const meeting = new Meeting({
           userId,
           botId: bot.id,
-          meetingUrl: typeof bot.meeting_url === 'string' ? bot.meeting_url : meetingUrl,
-          botName: bot.bot_name || botName || 'EchoTwin AI',
+          meetingUrl:
+            typeof bot.meeting_url === "string" ? bot.meeting_url : meetingUrl,
+          botName: bot.bot_name || botName || "AI Assistant",
           title: `Meeting - ${new Date().toLocaleDateString()}`,
-          status: 'active',
+          status: "active",
         });
         await meeting.save();
         console.log(`✅ Meeting record created: ${meeting._id}`);
       } catch (dbError) {
-        console.warn('⚠️ Failed to create meeting record:', dbError.message);
+        console.warn("⚠️ Failed to create meeting record:", dbError.message);
       }
     }
 
     res.json({
       success: true,
-      message: 'Bot is joining the meeting',
+      message: "Bot is joining the meeting",
       bot: {
         botId: bot.id,
         meetingUrl: bot.meeting_url,
         botName: bot.bot_name,
-        status: bot.status?.code || bot.status || 'joining',
+        status: bot.status?.code || bot.status || "joining",
       },
     });
   } catch (error) {
-    console.error('Error launching bot:', error);
+    console.error("Error launching bot:", error);
     res.status(500).json({
-      error: error.message || 'Failed to launch bot',
+      error: error.message || "Failed to launch bot",
     });
   }
 });
@@ -86,14 +87,14 @@ router.post('/launch', async (req, res) => {
  * Get bot status
  * GET /api/recall/status/:botId
  */
-router.get('/status/:botId', async (req, res) => {
+router.get("/status/:botId", async (req, res) => {
   try {
     const { botId } = req.params;
     const status = await recallService.getBotStatus(botId);
 
     if (!status) {
       return res.status(404).json({
-        error: 'Bot not found',
+        error: "Bot not found",
       });
     }
 
@@ -102,9 +103,9 @@ router.get('/status/:botId', async (req, res) => {
       bot: status,
     });
   } catch (error) {
-    console.error('Error getting bot status:', error);
+    console.error("Error getting bot status:", error);
     res.status(500).json({
-      error: error.message || 'Failed to get bot status',
+      error: error.message || "Failed to get bot status",
     });
   }
 });
@@ -117,13 +118,13 @@ router.get('/status/:botId', async (req, res) => {
  *   - botId: Bot ID (optional if userId provided)
  *   - userId: User ID (optional if botId provided)
  */
-router.post('/leave', async (req, res) => {
+router.post("/leave", async (req, res) => {
   try {
     const { botId, userId } = req.body;
 
     if (!botId && !userId) {
       return res.status(400).json({
-        error: 'Bot ID or User ID is required',
+        error: "Bot ID or User ID is required",
       });
     }
 
@@ -138,7 +139,7 @@ router.post('/leave', async (req, res) => {
 
     if (!targetBotId) {
       return res.status(404).json({
-        error: 'Bot not found',
+        error: "Bot not found",
       });
     }
 
@@ -149,25 +150,25 @@ router.post('/leave', async (req, res) => {
       try {
         const meeting = await Meeting.findOne({ botId: targetBotId });
         if (meeting) {
-          meeting.status = 'ended';
+          meeting.status = "ended";
           meeting.endTime = new Date();
           await meeting.save();
           console.log(`✅ Meeting ${meeting._id} marked as ended`);
         }
       } catch (dbError) {
-        console.warn('⚠️ Failed to update meeting status:', dbError.message);
+        console.warn("⚠️ Failed to update meeting status:", dbError.message);
       }
     }
 
     res.json({
       success: true,
-      message: 'Bot has left the meeting',
+      message: "Bot has left the meeting",
       result,
     });
   } catch (error) {
-    console.error('Error leaving meeting:', error);
+    console.error("Error leaving meeting:", error);
     res.status(500).json({
-      error: error.message || 'Failed to leave meeting',
+      error: error.message || "Failed to leave meeting",
     });
   }
 });
@@ -176,7 +177,7 @@ router.post('/leave', async (req, res) => {
  * Get all active bots (admin endpoint)
  * GET /api/recall/bots
  */
-router.get('/bots', (req, res) => {
+router.get("/bots", (req, res) => {
   try {
     const bots = recallService.getAllBots();
 
@@ -186,9 +187,9 @@ router.get('/bots', (req, res) => {
       bots,
     });
   } catch (error) {
-    console.error('Error getting bots:', error);
+    console.error("Error getting bots:", error);
     res.status(500).json({
-      error: error.message || 'Failed to get bots',
+      error: error.message || "Failed to get bots",
     });
   }
 });
@@ -197,14 +198,14 @@ router.get('/bots', (req, res) => {
  * Get user's active bot with live status
  * GET /api/recall/my-bot/:userId
  */
-router.get('/my-bot/:userId', async (req, res) => {
+router.get("/my-bot/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const bot = recallService.getBotByUserId(userId);
 
     if (!bot) {
       return res.status(404).json({
-        error: 'No active bot found for this user',
+        error: "No active bot found for this user",
       });
     }
 
@@ -221,9 +222,9 @@ router.get('/my-bot/:userId', async (req, res) => {
       bot,
     });
   } catch (error) {
-    console.error('Error getting user bot:', error);
+    console.error("Error getting user bot:", error);
     res.status(500).json({
-      error: error.message || 'Failed to get bot',
+      error: error.message || "Failed to get bot",
     });
   }
 });

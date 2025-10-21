@@ -1,5 +1,5 @@
-import express from 'express';
-import audioOutputService from '../services/audioOutputService.js';
+import express from "express";
+import audioOutputService from "../services/audioOutputService.js";
 
 const router = express.Router();
 
@@ -9,8 +9,8 @@ const router = express.Router();
  *
  * This page is loaded by Recall.ai's bot and plays audio automatically
  */
-router.get('/output-media', (req, res) => {
-  const serverUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+router.get("/output-media", (req, res) => {
+  const serverUrl = process.env.BACKEND_URL || "http://localhost:3001";
 
   const html = `
 <!DOCTYPE html>
@@ -55,7 +55,7 @@ router.get('/output-media', (req, res) => {
 <body>
     <div class="container">
         <div class="pulse"></div>
-        <div class="status" id="status">🤖 EchoTwin AI Ready</div>
+        <div class="status" id="status">🤖 AI Assistant Ready</div>
         <audio id="audio-player" autoplay></audio>
     </div>
 
@@ -121,10 +121,9 @@ router.get('/output-media', (req, res) => {
 </html>
   `;
 
-  res.setHeader('Content-Type', 'text/html');
+  res.setHeader("Content-Type", "text/html");
   res.send(html);
 });
-
 
 /**
  * Serve audio file for a bot
@@ -133,7 +132,7 @@ router.get('/output-media', (req, res) => {
  * This endpoint is used by Recall.ai's Output Media API
  * to fetch the audio that the bot should speak
  */
-router.get('/:botId', async (req, res) => {
+router.get("/:botId", async (req, res) => {
   try {
     const { botId } = req.params;
 
@@ -141,22 +140,22 @@ router.get('/:botId', async (req, res) => {
 
     if (!audioBuffer) {
       return res.status(404).json({
-        error: 'No audio available for this bot',
+        error: "No audio available for this bot",
       });
     }
 
     // Set proper headers for audio streaming
     res.set({
-      'Content-Type': 'audio/mpeg',
-      'Content-Length': audioBuffer.length,
-      'Cache-Control': 'no-cache',
+      "Content-Type": "audio/mpeg",
+      "Content-Length": audioBuffer.length,
+      "Cache-Control": "no-cache",
     });
 
     res.send(audioBuffer);
   } catch (error) {
-    console.error('Error serving audio:', error);
+    console.error("Error serving audio:", error);
     res.status(500).json({
-      error: 'Failed to serve audio',
+      error: "Failed to serve audio",
     });
   }
 });
@@ -165,7 +164,7 @@ router.get('/:botId', async (req, res) => {
  * Get active audio sessions (for debugging)
  * GET /api/audio/sessions/list
  */
-router.get('/sessions/list', (req, res) => {
+router.get("/sessions/list", (req, res) => {
   try {
     const sessions = audioOutputService.getActiveSessions();
 
@@ -175,9 +174,9 @@ router.get('/sessions/list', (req, res) => {
       sessions,
     });
   } catch (error) {
-    console.error('Error listing audio sessions:', error);
+    console.error("Error listing audio sessions:", error);
     res.status(500).json({
-      error: 'Failed to list sessions',
+      error: "Failed to list sessions",
     });
   }
 });
@@ -186,7 +185,7 @@ router.get('/sessions/list', (req, res) => {
  * Clear audio for a bot
  * DELETE /api/audio/:botId
  */
-router.delete('/:botId', async (req, res) => {
+router.delete("/:botId", async (req, res) => {
   try {
     const { botId } = req.params;
 
@@ -194,12 +193,12 @@ router.delete('/:botId', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Audio cleared',
+      message: "Audio cleared",
     });
   } catch (error) {
-    console.error('Error clearing audio:', error);
+    console.error("Error clearing audio:", error);
     res.status(500).json({
-      error: 'Failed to clear audio',
+      error: "Failed to clear audio",
     });
   }
 });

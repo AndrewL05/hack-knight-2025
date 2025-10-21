@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useUser } from "@clerk/clerk-react";
 
 export interface BotStatus {
   botId: string;
@@ -19,8 +19,8 @@ export const useBot = () => {
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+  const wsUrl = import.meta.env.VITE_WS_URL || "ws://localhost:3001";
 
   /**
    * Connect to WebSocket to receive bot events
@@ -34,7 +34,7 @@ export const useBot = () => {
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('✅ Bot WebSocket connected');
+        console.log("✅ Bot WebSocket connected");
       };
 
       ws.onmessage = (event) => {
@@ -42,42 +42,42 @@ export const useBot = () => {
           const message = JSON.parse(event.data);
 
           switch (message.type) {
-            case 'bot_created':
-              console.log('Bot created and joining meeting:', message.data);
+            case "bot_created":
+              console.log("Bot created and joining meeting:", message.data);
               setBotData({
                 botId: message.data.botId,
-                meetingNumber: '', // Not used with Recall.ai
-                botName: 'EchoTwin AI',
+                meetingNumber: "", // Not used with Recall.ai
+                botName: "AI Assistant",
                 status: message.data.status,
                 isMuted: false,
                 isAudioEnabled: true,
                 joinedAt: new Date(),
-                uptime: 0
+                uptime: 0,
               });
               break;
 
-            case 'bot_left':
-              console.log('Bot left meeting:', message.data);
+            case "bot_left":
+              console.log("Bot left meeting:", message.data);
               setBotData(null);
               break;
 
-            case 'bot_status':
+            case "bot_status":
               if (message.data) {
                 setBotData({
                   botId: message.data.id || message.data.botId,
-                  meetingNumber: '',
-                  botName: message.data.bot_name || 'EchoTwin AI',
+                  meetingNumber: "",
+                  botName: message.data.bot_name || "AI Assistant",
                   status: message.data.status?.code || message.data.status,
                   isMuted: false,
                   isAudioEnabled: true,
                   joinedAt: new Date(message.data.created_at || Date.now()),
-                  uptime: 0
+                  uptime: 0,
                 });
               }
               break;
 
-            case 'ai_response':
-              console.log('AI response generated:', message.data.text);
+            case "ai_response":
+              console.log("AI response generated:", message.data.text);
               break;
 
             default:
@@ -85,23 +85,23 @@ export const useBot = () => {
               break;
           }
         } catch (err) {
-          console.error('Failed to parse bot WebSocket message:', err);
+          console.error("Failed to parse bot WebSocket message:", err);
         }
       };
 
       ws.onerror = (event) => {
-        console.error('Bot WebSocket error:', event);
+        console.error("Bot WebSocket error:", event);
       };
 
       ws.onclose = () => {
-        console.log('Bot WebSocket disconnected');
+        console.log("Bot WebSocket disconnected");
         // Attempt to reconnect after 3 seconds
         setTimeout(connectWebSocket, 3000);
       };
 
       wsRef.current = ws;
     } catch (err) {
-      console.error('Failed to create bot WebSocket:', err);
+      console.error("Failed to create bot WebSocket:", err);
     }
   }, [wsUrl]);
 
@@ -121,149 +121,160 @@ export const useBot = () => {
       }
 
       if (!response.ok) {
-        throw new Error('Failed to fetch bot status');
+        throw new Error("Failed to fetch bot status");
       }
 
       const data = await response.json();
       if (data.success && data.bot) {
         setBotData({
           botId: data.bot.botId,
-          meetingNumber: '',
-          botName: data.bot.botName || 'EchoTwin AI',
+          meetingNumber: "",
+          botName: data.bot.botName || "AI Assistant",
           status: data.bot.status,
           isMuted: false,
           isAudioEnabled: true,
           joinedAt: new Date(data.bot.createdAt),
-          uptime: 0
+          uptime: 0,
         });
       }
     } catch (err) {
-      console.error('Error fetching bot status:', err);
+      console.error("Error fetching bot status:", err);
     }
   }, [user, apiUrl]);
 
   /**
    * Leave meeting
    */
-  const leaveMeeting = useCallback(async (botId?: string) => {
-    if (!user && !botId) {
-      setError('No bot ID or user available');
-      return false;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${apiUrl}/api/recall/leave`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          botId: botId || botData?.botId
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to leave meeting');
+  const leaveMeeting = useCallback(
+    async (botId?: string) => {
+      if (!user && !botId) {
+        setError("No bot ID or user available");
+        return false;
       }
 
-      setBotData(null);
-      return true;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to leave meeting';
-      setError(errorMsg);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, botData, apiUrl]);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${apiUrl}/api/recall/leave`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            botId: botId || botData?.botId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to leave meeting");
+        }
+
+        setBotData(null);
+        return true;
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : "Failed to leave meeting";
+        setError(errorMsg);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user, botData, apiUrl]
+  );
 
   /**
    * Generate AI response
    */
-  const generateResponse = useCallback(async (customPrompt?: string) => {
-    if (!botData) {
-      setError('No active bot');
-      return false;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${apiUrl}/api/assistant/respond`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          botId: botData.botId,
-          customPrompt
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate response');
+  const generateResponse = useCallback(
+    async (customPrompt?: string) => {
+      if (!botData) {
+        setError("No active bot");
+        return false;
       }
 
-      console.log('✅ AI response generated:', data.response);
-      return true;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to generate AI response';
-      setError(errorMsg);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [botData, apiUrl]);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${apiUrl}/api/assistant/respond`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            botId: botData.botId,
+            customPrompt,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to generate response");
+        }
+
+        console.log("✅ AI response generated:", data.response);
+        return true;
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error ? err.message : "Failed to generate AI response";
+        setError(errorMsg);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [botData, apiUrl]
+  );
 
   /**
    * Make bot speak (text-to-speech)
    */
-  const speak = useCallback(async (text: string, voiceId?: string) => {
-    if (!botData) {
-      setError('No active bot');
-      return false;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      console.log(`Bot speaking: "${text}"`);
-
-      const response = await fetch(`${apiUrl}/api/voice/speak`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          botId: botData.botId,
-          voiceId
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate speech');
+  const speak = useCallback(
+    async (text: string, voiceId?: string) => {
+      if (!botData) {
+        setError("No active bot");
+        return false;
       }
 
-      console.log('✅ Bot spoke successfully');
-      return true;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to speak';
-      setError(errorMsg);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [botData, apiUrl]);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        console.log(`Bot speaking: "${text}"`);
+
+        const response = await fetch(`${apiUrl}/api/voice/speak`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text,
+            botId: botData.botId,
+            voiceId,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to generate speech");
+        }
+
+        console.log("✅ Bot spoke successfully");
+        return true;
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Failed to speak";
+        setError(errorMsg);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [botData, apiUrl]
+  );
 
   // Connect WebSocket on mount
   useEffect(() => {
@@ -286,11 +297,13 @@ export const useBot = () => {
   // Poll for status updates only when bot is joining/connecting
   useEffect(() => {
     // Only poll if bot exists and is not yet in final state
-    if (!botData ||
-        botData.status === 'in_call_recording' ||
-        botData.status === 'in_call' ||
-        botData.status === 'done' ||
-        botData.status === 'fatal') {
+    if (
+      !botData ||
+      botData.status === "in_call_recording" ||
+      botData.status === "in_call" ||
+      botData.status === "done" ||
+      botData.status === "fatal"
+    ) {
       return;
     }
 
@@ -313,6 +326,6 @@ export const useBot = () => {
     fetchBotStatus,
     leaveMeeting,
     generateResponse,
-    speak
+    speak,
   };
 };

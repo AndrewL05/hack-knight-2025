@@ -11,13 +11,10 @@ interface LaunchBotProps {
   onError?: (error: string) => void;
 }
 
-export const LaunchBot = ({
-  onBotLaunched,
-  onError,
-}: LaunchBotProps) => {
+export const LaunchBot = ({ onBotLaunched, onError }: LaunchBotProps) => {
   const { user } = useUser();
   const [meetingUrl, setMeetingUrl] = useState("");
-  const [botName, setBotName] = useState("EchoTwin AI");
+  const [botName, setBotName] = useState("AI Assistant");
   const [isLaunching, setIsLaunching] = useState(false);
   const [launchStatus, setLaunchStatus] = useState<
     "idle" | "success" | "error"
@@ -53,7 +50,7 @@ export const LaunchBot = ({
         },
         body: JSON.stringify({
           meetingUrl: meetingUrl.trim(),
-          botName: botName.trim() || "EchoTwin AI",
+          botName: botName.trim() || "AI Assistant",
           userId: user.id,
         }),
       });
@@ -84,97 +81,97 @@ export const LaunchBot = ({
 
   return (
     <Card className="p-6 bg-card/50 backdrop-blur-glass border-primary/10">
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow">
-              <Rocket className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg">Launch AI Assistant</h3>
-              <p className="text-sm text-muted-foreground">
-                Join Zoom, Google Meet, Teams, or any meeting platform
-              </p>
-            </div>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center shadow-glow">
+            <Rocket className="w-6 h-6 text-primary-foreground" />
           </div>
-
-          <div className="space-y-4">
-            {/* Meeting URL Input */}
-            <div className="space-y-2">
-              <Label htmlFor="meeting-url">
-                Meeting URL <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="meeting-url"
-                placeholder="https://zoom.us/j/123... or https://meet.google.com/..."
-                value={meetingUrl}
-                onChange={(e) => setMeetingUrl(e.target.value)}
-                disabled={isLaunching}
-                className="bg-background/50"
-              />
-              <p className="text-xs text-muted-foreground">
-                Supports Zoom, Google Meet, Microsoft Teams, Webex, Slack
-              </p>
-            </div>
-
-            {/* Bot Name Input */}
-            <div className="space-y-2">
-              <Label htmlFor="bot-name">Bot Display Name</Label>
-              <Input
-                id="bot-name"
-                placeholder="AI Assistant"
-                value={botName}
-                onChange={(e) => setBotName(e.target.value)}
-                disabled={isLaunching}
-                className="bg-background/50"
-              />
-            </div>
-
-            {/* Status Messages */}
-            {launchStatus === "success" && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30 text-primary">
-                <CheckCircle2 className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  AI Assistant launched successfully!
-                </span>
-              </div>
-            )}
-
-            {launchStatus === "error" && errorMessage && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive">
-                <XCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">{errorMessage}</span>
-              </div>
-            )}
-
-            {/* Launch Button */}
-            <Button
-              onClick={handleLaunch}
-              disabled={isLaunching || !meetingUrl.trim()}
-              className="w-full bg-gradient-primary hover:shadow-glow-strong"
-              size="lg"
-            >
-              {isLaunching ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Joining Meeting...
-                </>
-              ) : (
-                <>
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Launch AI Assistant
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Help Text */}
-          <div className="pt-4 border-t border-border/50">
-            <p className="text-xs text-muted-foreground">
-              Your AI Assistant will join as a bot participant, transcribe the
-              conversation, and can respond with your cloned voice.
+          <div>
+            <h3 className="font-semibold text-lg">Launch AI Assistant</h3>
+            <p className="text-sm text-muted-foreground">
+              Join Zoom, Google Meet, Teams, or any meeting platform
             </p>
           </div>
         </div>
-      </Card>
+
+        <div className="space-y-4">
+          {/* Meeting URL Input */}
+          <div className="space-y-2">
+            <Label htmlFor="meeting-url">
+              Meeting URL <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="meeting-url"
+              placeholder="https://zoom.us/j/123... or https://meet.google.com/..."
+              value={meetingUrl}
+              onChange={(e) => setMeetingUrl(e.target.value)}
+              disabled={isLaunching}
+              className="bg-background/50"
+            />
+            <p className="text-xs text-muted-foreground">
+              Supports Zoom, Google Meet, Microsoft Teams, Webex, Slack
+            </p>
+          </div>
+
+          {/* Bot Name Input */}
+          <div className="space-y-2">
+            <Label htmlFor="bot-name">Bot Display Name</Label>
+            <Input
+              id="bot-name"
+              placeholder="AI Assistant"
+              value={botName}
+              onChange={(e) => setBotName(e.target.value)}
+              disabled={isLaunching}
+              className="bg-background/50"
+            />
+          </div>
+
+          {/* Status Messages */}
+          {launchStatus === "success" && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/10 border border-primary/30 text-primary">
+              <CheckCircle2 className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                AI Assistant launched successfully!
+              </span>
+            </div>
+          )}
+
+          {launchStatus === "error" && errorMessage && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive">
+              <XCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Launch Button */}
+          <Button
+            onClick={handleLaunch}
+            disabled={isLaunching || !meetingUrl.trim()}
+            className="w-full bg-gradient-primary hover:shadow-glow-strong"
+            size="lg"
+          >
+            {isLaunching ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Joining Meeting...
+              </>
+            ) : (
+              <>
+                <Rocket className="w-5 h-5 mr-2" />
+                Launch AI Assistant
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Help Text */}
+        <div className="pt-4 border-t border-border/50">
+          <p className="text-xs text-muted-foreground">
+            Your AI Assistant will join as a bot participant, transcribe the
+            conversation, and can respond with your cloned voice.
+          </p>
+        </div>
+      </div>
+    </Card>
   );
 };

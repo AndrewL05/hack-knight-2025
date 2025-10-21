@@ -1,7 +1,7 @@
 {
   "name": "echotwin-backend",
   "version": "1.0.0",
-  "description": "EchoTwin AI Meeting Assistant Backend",
+  "description": "AI Meeting Assistant Backend",
   "main": "app/index.js",
   "type": "module",
   "scripts": {
